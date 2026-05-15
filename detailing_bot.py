@@ -19,7 +19,7 @@ from aiogram.types import (
 # ──────────────────────────────────────────────
 # Настройки — замените на свои значения
 # ──────────────────────────────────────────────
-BOT_TOKEN = "8749853977:AAEqfjGl1qBHhx2wCKXuRFFeeWaB2e7w-qQ"          # токен от @BotFather
+BOT_TOKEN = "8749853977:AAFjB2s3W3s8SaIG5TcBt5wAQDjf1FfkLhs"          # токен от @BotFather
 ADMIN_CHAT_ID = 8488240834             # chat_id администратора/группы
 MANAGER_USERNAME = "@slimepointtt"    # username менеджера
 MANAGER_PHONE = "+7 (999) 000-00-00"  # телефон для звонка (показывается клиенту)
