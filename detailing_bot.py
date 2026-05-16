@@ -3,7 +3,7 @@ Telegram-бот для детейлинг студии
 Библиотека: aiogram v3
 Запуск: polling
 """
-
+ 
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, F, Router
@@ -15,23 +15,23 @@ from aiogram.types import (
     ReplyKeyboardRemove,
     Contact,
 )
-
+ 
 # ──────────────────────────────────────────────
 # Настройки — замените на свои значения
 # ──────────────────────────────────────────────
-BOT_TOKEN = "YOUR_BOT_TOKEN"          # токен от @BotFather
-ADMIN_CHAT_ID = 123456789             # chat_id администратора/группы
+BOT_TOKEN = "8749853977:AAFjB2s3W3s8SaIG5TcBt5wAQDjf1FfkLhs"          # токен от @BotFather
+ADMIN_CHAT_ID = 8749853977             # chat_id администратора/группы
 MANAGER_USERNAME = "@slimepointtt"    # username менеджера
-MANAGER_PHONE = "+7 (999) 000-00-00"  # телефон для звонка (показывается клиенту)
+MANAGER_PHONE = "+7 (909) 000-69-44"  # телефон для звонка (показывается клиенту)
 # ──────────────────────────────────────────────
-
+ 
 logging.basicConfig(level=logging.INFO)
-
+ 
 router = Router()
-
+ 
 # Временное хранилище состояний
 user_data: dict[int, dict] = {}
-
+ 
 # ──────────────────────────────────────────────
 # Шаги (этапы) диалога
 # ──────────────────────────────────────────────
@@ -41,16 +41,16 @@ STEP_CAR     = "car"
 STEP_TASK    = "task"
 STEP_PHONE   = "phone"
 STEP_DONE    = "done"
-
+ 
 SERVICES = ["🚿 Мойка", "✨ Полировка", "🧼 Химчистка", "📦 Другое"]
-
+ 
 CAR_CLASSES = [
     "🚗 1 класс (A, B, C)",
     "🚙 2 класс (D, E, SUV)",
     "🚐 3 класс (F, S, M)",
     "🚌 4 класс (XTRA, J)",
 ]
-
+ 
 PRICE_BY_CLASS = {
     "🚗 1 класс (A, B, C)": (
         "🚗 <b>1 класс</b> — хэтчбеки, малые седаны (A, B, C)\n"
@@ -125,11 +125,11 @@ PRICE_BY_CLASS = {
         "   <i>Просто водой</i>"
     ),
 }
-
+ 
 # ──────────────────────────────────────────────
 # Клавиатуры
 # ──────────────────────────────────────────────
-
+ 
 def kb_main() -> ReplyKeyboardMarkup:
     buttons = [
         [KeyboardButton(text="🚿 Мойка"),     KeyboardButton(text="✨ Полировка")],
@@ -137,8 +137,8 @@ def kb_main() -> ReplyKeyboardMarkup:
         [KeyboardButton(text="📋 Прайс")],
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
-
-
+ 
+ 
 def kb_car_class() -> ReplyKeyboardMarkup:
     buttons = [
         [KeyboardButton(text="🚗 1 класс (A, B, C)"),  KeyboardButton(text="🚙 2 класс (D, E, SUV)")],
@@ -146,13 +146,22 @@ def kb_car_class() -> ReplyKeyboardMarkup:
         [KeyboardButton(text="🏠 Главное меню")],
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
-
-
+ 
+ 
+def kb_price_menu() -> ReplyKeyboardMarkup:
+    buttons = [
+        [KeyboardButton(text="🚿 Прайс: Мойка"),      KeyboardButton(text="✨ Прайс: Полировка")],
+        [KeyboardButton(text="🧼 Прайс: Химчистка")],
+        [KeyboardButton(text="🏠 Главное меню")],
+    ]
+    return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
+ 
+ 
 def kb_phone() -> ReplyKeyboardMarkup:
     buttons = [[KeyboardButton(text="📞 Отправить номер", request_contact=True)]]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True, one_time_keyboard=True)
-
-
+ 
+ 
 def kb_after_order() -> ReplyKeyboardMarkup:
     buttons = [
         [KeyboardButton(text="📞 Позвонить")],
@@ -160,27 +169,27 @@ def kb_after_order() -> ReplyKeyboardMarkup:
         [KeyboardButton(text="🏠 Главное меню")],
     ]
     return ReplyKeyboardMarkup(keyboard=buttons, resize_keyboard=True)
-
+ 
 # ──────────────────────────────────────────────
 # Хелперы
 # ──────────────────────────────────────────────
-
+ 
 def get_step(user_id: int) -> str:
     return user_data.get(user_id, {}).get("step", STEP_IDLE)
-
+ 
 def set_step(user_id: int, step: str) -> None:
     user_data.setdefault(user_id, {})["step"] = step
-
+ 
 def save_field(user_id: int, key: str, value) -> None:
     user_data.setdefault(user_id, {})[key] = value
-
+ 
 def reset_user(user_id: int) -> None:
     user_data[user_id] = {"step": STEP_IDLE}
-
+ 
 # ──────────────────────────────────────────────
 # Хэндлеры
 # ──────────────────────────────────────────────
-
+ 
 @router.message(Command("start"))
 async def cmd_start(message: Message) -> None:
     reset_user(message.from_user.id)
@@ -191,12 +200,21 @@ async def cmd_start(message: Message) -> None:
         parse_mode="HTML",
         reply_markup=kb_main(),
     )
-
-
+ 
+ 
 @router.message(F.text == "📋 Прайс")
 async def show_price(message: Message) -> None:
     await message.answer(
-        "📋 <b>Прайс-лист — Комплексные мойки</b>\n\n"
+        "📋 <b>Прайс-лист</b>\n\nВыберите категорию услуги 👇",
+        parse_mode="HTML",
+        reply_markup=kb_price_menu(),
+    )
+ 
+ 
+@router.message(F.text == "🚿 Прайс: Мойка")
+async def price_wash(message: Message) -> None:
+    await message.answer(
+        "🚿 <b>Прайс: Комплексные мойки</b>\n\n"
         "Выберите класс вашего автомобиля 👇\n\n"
         "<b>1 класс</b> — A, B, C (Polo, Rio, Solaris...)\n"
         "<b>2 класс</b> — D, E, SUV (Camry, Tiguan, X5...)\n"
@@ -205,8 +223,34 @@ async def show_price(message: Message) -> None:
         parse_mode="HTML",
         reply_markup=kb_car_class(),
     )
-
-
+ 
+ 
+@router.message(F.text == "✨ Прайс: Полировка")
+async def price_polish(message: Message) -> None:
+    await message.answer(
+        "✨ <b>Полировка кузова</b>\n\n"
+        "Убираем царапины, потёртости, восстанавливаем блеск ЛКП.\n\n"
+        "└ <b>Полировка кузова</b> — <b>от 12 000 ₽</b>\n"
+        "   <i>Цена зависит от класса авто и степени повреждений.</i>\n\n"
+        "📝 <b>Хотите записаться?</b> Выберите услугу в меню 👇",
+        parse_mode="HTML",
+        reply_markup=kb_main(),
+    )
+ 
+ 
+@router.message(F.text == "🧼 Прайс: Химчистка")
+async def price_cleaning(message: Message) -> None:
+    await message.answer(
+        "🧼 <b>Химчистка салона</b>\n\n"
+        "Глубокая очистка всех поверхностей салона.\n\n"
+        "└ <b>Химчистка салона</b> — <b>от 8 000 ₽</b>\n"
+        "   <i>Цена зависит от класса авто и степени загрязнения.</i>\n\n"
+        "📝 <b>Хотите записаться?</b> Выберите услугу в меню 👇",
+        parse_mode="HTML",
+        reply_markup=kb_main(),
+    )
+ 
+ 
 @router.message(F.text.in_(CAR_CLASSES))
 async def show_price_by_class(message: Message) -> None:
     text = PRICE_BY_CLASS.get(message.text, "")
@@ -215,8 +259,8 @@ async def show_price_by_class(message: Message) -> None:
         parse_mode="HTML",
         reply_markup=kb_main(),
     )
-
-
+ 
+ 
 @router.message(F.text.in_(SERVICES))
 async def handle_service(message: Message) -> None:
     user_id = message.from_user.id
@@ -229,13 +273,13 @@ async def handle_service(message: Message) -> None:
         parse_mode="HTML",
         reply_markup=ReplyKeyboardRemove(),
     )
-
-
+ 
+ 
 @router.message(F.text)
 async def handle_text(message: Message) -> None:
     user_id = message.from_user.id
     step = get_step(user_id)
-
+ 
     if step == STEP_CAR:
         save_field(user_id, "car", message.text)
         set_step(user_id, STEP_TASK)
@@ -245,7 +289,7 @@ async def handle_text(message: Message) -> None:
             parse_mode="HTML",
         )
         return
-
+ 
     if step == STEP_TASK:
         save_field(user_id, "task", message.text)
         set_step(user_id, STEP_PHONE)
@@ -255,7 +299,7 @@ async def handle_text(message: Message) -> None:
             reply_markup=kb_phone(),
         )
         return
-
+ 
     if message.text == "📞 Позвонить":
         await message.answer(
             "Мы скоро вам позвоним 📞\n\n"
@@ -264,7 +308,7 @@ async def handle_text(message: Message) -> None:
             reply_markup=kb_after_order(),
         )
         return
-
+ 
     if message.text == "💬 Написать в Telegram":
         await message.answer(
             f"Напишите нашему менеджеру: <b>{MANAGER_USERNAME}</b>\n"
@@ -273,34 +317,34 @@ async def handle_text(message: Message) -> None:
             reply_markup=kb_after_order(),
         )
         return
-
+ 
     if message.text == "🏠 Главное меню":
         reset_user(user_id)
         set_step(user_id, STEP_SERVICE)
         await message.answer("Главное меню 👇", reply_markup=kb_main())
         return
-
+ 
     await message.answer(
         "Пожалуйста, используйте кнопки меню или начните с /start",
         reply_markup=kb_main(),
     )
-
-
+ 
+ 
 @router.message(F.contact)
 async def handle_contact(message: Message) -> None:
     user_id = message.from_user.id
-
+ 
     if get_step(user_id) != STEP_PHONE:
         await message.answer("Используйте /start для начала.", reply_markup=kb_main())
         return
-
+ 
     contact: Contact = message.contact
     phone = contact.phone_number
     save_field(user_id, "phone", phone)
     set_step(user_id, STEP_DONE)
-
+ 
     data = user_data.get(user_id, {})
-
+ 
     admin_text = (
         "🚗 <b>НОВАЯ ЗАЯВКА</b>\n\n"
         f"Услуга: {data.get('service', '—')}\n"
@@ -310,7 +354,7 @@ async def handle_contact(message: Message) -> None:
         f"Telegram: @{message.from_user.username or 'нет username'}"
     )
     await message.bot.send_message(ADMIN_CHAT_ID, admin_text, parse_mode="HTML")
-
+ 
     await message.answer(
         "✅ <b>Заявка принята!</b>\n\n"
         "Наш менеджер свяжется с вами в ближайшее время.\n\n"
@@ -318,18 +362,18 @@ async def handle_contact(message: Message) -> None:
         parse_mode="HTML",
         reply_markup=kb_after_order(),
     )
-
-
+ 
+ 
 # ──────────────────────────────────────────────
 # Запуск
 # ──────────────────────────────────────────────
-
+ 
 async def main() -> None:
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
     dp.include_router(router)
     await dp.start_polling(bot)
-
-
+ 
+ 
 if __name__ == "__main__":
     asyncio.run(main())
