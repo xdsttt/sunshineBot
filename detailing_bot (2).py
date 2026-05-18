@@ -18,10 +18,10 @@ from aiogram.types import (
 # ──────────────────────────────────────────────
 # Настройки
 # ──────────────────────────────────────────────
-BOT_TOKEN = "YOUR_BOT_TOKEN"
-ADMIN_CHAT_ID = 123456789
+BOT_TOKEN = "8749853977:AAFjB2s3W3s8SaIG5TcBt5wAQDjf1FfkLhs"
+ADMIN_CHAT_ID = 8749853977
 MANAGER_USERNAME = "@slimepointtt"
-MANAGER_PHONE = "+7 (999) 000-00-00"
+MANAGER_PHONE = "+7 (909) 000-69-44"
 # ──────────────────────────────────────────────
 
 logging.basicConfig(level=logging.INFO)
